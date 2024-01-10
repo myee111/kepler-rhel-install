@@ -5,6 +5,9 @@ This playbook configures kepler for RHEL.
 
 Make sure `ansible-core` is installed.
 
-Run the following command.
+Clone this repo.
+`git clone https://github.com/myee111/kepler-rhel-install.git`
+
+In the `kepler-rhel-install` directory, run the following command.
 
 `ansible-playbook kepler-rhel-install.yml`
