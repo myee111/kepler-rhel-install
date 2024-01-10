@@ -1,0 +1,13 @@
+---
+- name: Install kepler for RHEL.
+  remote_user: root
+  hosts: localhost
+  vars_files:
+    - var
+
+  tasks:
+    - name: Unarchive kepler binary
+      ansible.builtin.unarchive:
+        src: https://github.com/sustainable-computing-io/kepler/releases/download/v{{ version }}/kepler.rpm.tar.gz
+        dest: /tmp/
+        remote_src: true
