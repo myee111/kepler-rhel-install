@@ -6,8 +6,62 @@
     - var
 
   tasks:
-    - name: Unarchive kepler binary
+    - name: Unarchive kepler binary.
       ansible.builtin.unarchive:
         src: https://github.com/sustainable-computing-io/kepler/releases/download/v{{ version }}/kepler.rpm.tar.gz
         dest: /tmp/
         remote_src: true
+
+    - name: Install the kepler rpm.
+      ansible.builtin.dnf:
+        name: /{{ install_dir }}/RPMS/x86_64/{{ kepler_filename }}
+        state: present
+        disable_gpg_check: true
+      become: true
+
+- name: Install Performance Co-pilot and related tools.
+  remote_user: root
+  hosts: localhost
+  vars_files:
+    - var
+
+  tasks:
+    - name: Install pcp tools.
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ pcp_tools }}"
+      become: true
+
+    - name: Enable and start the pmcd service.
+      ansible.builtin.service:
+        name: pmcd
+        enabled: true
+        state: started
+      become: true
+
+    - name: Enable and start the kepler service.
+      ansible.builtin.service:
+        name: kepler
+        enabled: true
+        state: started
+      become: true
+
+    - name: Configure openmetrics.
+      ansible.builtin.shell:
+        cmd: echo "http://localhost:8888/metrics" > config.d/kepler.url
+      register: my_output
+      changed_when: my_output.rc != 0
+      become: true
+      args:
+        chdir: /var/lib/pcp/pmdas/openmetrics/
+
+    - name: Install openmetrics.
+      ansible.builtin.command:
+        argv:
+          - /var/lib/pcp/pmdas/openmetrics/Install
+      register: my_output
+      changed_when: my_output.rc != 0
+      become: true
+      args:
+        chdir: /var/lib/pcp/pmdas/openmetrics/

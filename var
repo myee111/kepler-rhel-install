@@ -1,1 +1,7 @@
 version: 0.7.1
+install_dir: tmp
+kepler_filename: kepler-0.7.1-0.7.1.x86_64.rpm
+pcp_tools:
+  - pcp
+  - pcp-system-tools
+  - pcp-pmda-openmetrics
